@@ -7,6 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { UserContextProvider } from './user-context';
+import Track from './Track';
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/track",
-    element: <App />
+    element: <Track />
   }
 ]);
 

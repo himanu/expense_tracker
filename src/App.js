@@ -3,6 +3,7 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { auth } from "./firebase.config";
 import { GoogleAuthProvider, EmailAuthProvider } from "firebase/auth";
 import { UserContext } from "./user-context";
+import { Link } from "react-router-dom";
 
 const uiConfig = {
   signInFlow: 'popup',
@@ -37,9 +38,9 @@ function App() {
       }
       
       {!isLoading && user && (
-        <button className="text-sm mt-5 bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700 ml-3  py-1 px-3 rounded-md">
+        <Link to="/track" className="text-sm mt-5 bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700 ml-3  py-1 px-3 rounded-md">
           Track Expenses
-        </button>
+        </Link>
       )}
       
     </div>
