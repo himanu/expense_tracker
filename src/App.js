@@ -23,11 +23,10 @@ function App() {
     });
     return () => unregister();
   }, []);
-
   return (
     <div className="text-white text-center m-auto pt-[5%] bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 h-screen">
       <div className="text-3xl">
-        Welcome to Expense Tracker !
+        {user.displayName ? `Hey ${user.displayName.split(" ")[0]}, ` : ""}Welcome to Expense Tracker!
       </div>
       <div className="mt-4 text-md">
         Add, View, Edit and Delete your expenses.
@@ -45,6 +44,11 @@ function App() {
         )
       }
       
+      {!isLoading && user && (
+        <button className="text-sm mt-5 bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700 ml-3  py-1 px-3 rounded-md">
+          Track Expenses
+        </button>
+      )}
       
     </div>
   );
