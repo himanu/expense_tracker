@@ -1,7 +1,8 @@
-import {useState, useEffect} from "react";
+import {useContext} from "react";
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 import { auth } from "./firebase.config";
 import { GoogleAuthProvider, EmailAuthProvider } from "firebase/auth";
+import { UserContext } from "./user-context";
 
 const uiConfig = {
   signInFlow: 'popup',
@@ -13,18 +14,9 @@ const uiConfig = {
 };
 
 function App() {
-  const [user, setUser] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const unregister = auth.onAuthStateChanged((user) => {
-      setUser(user ?? "");
-      setIsLoading(false);
-    });
-    return () => unregister();
-  }, []);
+  const { user, isLoading, signOutUser } = useContext(UserContext);
   return (
-    <div className="text-white text-center m-auto pt-[5%] bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 h-screen">
+    <div>
       <div className="text-3xl">
         {user.displayName ? `Hey ${user.displayName.split(" ")[0]}, ` : ""}Welcome to Expense Tracker!
       </div>
@@ -36,7 +28,7 @@ function App() {
           !user ? <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> : (
             <button 
               className="text-sm mt-5 hover:bg-gradient-to-l from-purple-700 via-purple-900 to-purple-700 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-900  py-1 px-3 rounded-md"
-              onClick={() => auth.signOut()}
+              onClick={signOutUser}
             >
               Sign Out
             </button>
