@@ -1,15 +1,24 @@
 import { IoMdAdd } from "react-icons/io";
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { uploadFile } from "./storage";
+import { UserContext } from "./user-context";
+import { addDocument } from "./firestore";
+
 const Track = () => {
+    const [isOpen, toggleIsOpen] = useState(false);
+
     return (
         <div>
             <h1 className="text-3xl">
                 Expenses
             </h1>
-            <button className="text-base flex w-[30%] m-auto justify-center gap-2 items-center mt-4 py-3 px-4 rounded-lg bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700">
+            <button 
+                onClick={() => toggleIsOpen(true)}
+                className="text-base flex w-[30%] m-auto justify-center gap-2 items-center mt-4 py-3 px-4 rounded-lg bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700"
+            >
                 Add <IoMdAdd />
             </button>
-            <ExpensePopup />
+            {isOpen && <ExpensePopup onClose={() => toggleIsOpen(false)} /> }
         </div>
     )
 };
@@ -20,26 +29,57 @@ const ExpensePopup = ({ onClose }) => {
     const [location, setLocation] = useState('');
     const [item, setItem] = useState('');
     const [amount, setAmount] = useState('');
+    const { user }  = useContext(UserContext);
 
-    const handleSubmit = () => {
-        setFile(null);
-        setDate('');
-        setLocation('');
-        setItem('');
-        setAmount('');
-        onClose();
+    const handleSubmit = async (e) => {
+        try {
+            e.preventDefault();
+            if (!date || !location || !item || !amount || !file)
+                return;
+            const filePath = await uploadFile(file, user?.uid);
+            await addDocument({
+                date,
+                location,
+                item,
+                amount: Number(amount),
+                uid: user?.uid,
+                receipt:  filePath ?? ""
+            })
+            setFile(null);
+            setDate('');
+            setLocation('');
+            setItem('');
+            setAmount('');
+            onClose();
+        } catch (err) {
+            console.log("Error ", err);
+        }
     };
 
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        } else {
+            setFile(null);
+        }
+    };
     return (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-            <div className="bg-white text-gray-800 p-8 rounded-md shadow-md w-96">
+            <form className="bg-white text-gray-800 p-8 rounded-md shadow-md w-96">
+                <div className="flex justify-center text-lg mb-4 font-bold">
+                    Add Expense
+                </div>
                 <label className="block mb-4">
-                    File Input (Image):
-                    <input
-                        type="file"
-                        accept="image/*"
-                        className="w-full border border-gray-300 p-2 rounded"
-                        onChange={(e) => setFile(e.target.files[0])}
+                    <span className="sr-only">Choose Receipt</span>
+                    <input type="file" accept="image/*"  className="block w-full text-sm text-slate-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-violet-50 file:text-violet-700
+                      hover:file:bg-violet-100"
+                      onChange={handleFileChange}
+                      required
                     />
                 </label>
                 <label className="block mb-4">
@@ -49,6 +89,7 @@ const ExpensePopup = ({ onClose }) => {
                         value={date}
                         className="w-full border border-gray-300 p-2 rounded"
                         onChange={(e) => setDate(e.target.value)}
+                        required
                     />
                 </label>
                 <label className="block mb-4">
@@ -58,6 +99,7 @@ const ExpensePopup = ({ onClose }) => {
                         value={location}
                         className="w-full border border-gray-300 p-2 rounded"
                         onChange={(e) => setLocation(e.target.value)}
+                        required
                     />
                 </label>
                 <label className="block mb-4">
@@ -67,6 +109,7 @@ const ExpensePopup = ({ onClose }) => {
                         value={item}
                         className="w-full border border-gray-300 p-2 rounded"
                         onChange={(e) => setItem(e.target.value)}
+                        required
                     />
                 </label>
                 <label className="block mb-4">
@@ -77,21 +120,23 @@ const ExpensePopup = ({ onClose }) => {
                         value={amount}
                         className="w-full border border-gray-300 p-2 rounded"
                         onChange={(e) => setAmount(e.target.value)}
+                        required
                     />
                 </label>
                 <button
                     className="bg-blue-500 text-white px-4 p-2 rounded hover:bg-blue-700"
                     onClick={handleSubmit}
+                    type="submit"
                 >
                     Add
                 </button>
                 <button
                     className="ml-2 px-4 bg-red-500 text-white p-2 rounded hover:bg-red-700"
-                    onClick={handleSubmit}
+                    onClick={onClose}
                 >
                     Cancel
                 </button>
-            </div>
+            </form>
         </div>
     );
 };
