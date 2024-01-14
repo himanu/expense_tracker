@@ -1,33 +1,25 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import ReactDOM from 'react-dom';
 import "./index.css";
 import App from './App';
 import {
-  createBrowserRouter,
-  RouterProvider,
+  Navigate
 } from "react-router-dom";
 import { UserContextProvider } from './user-context';
-import Track from './Track';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-  {
-    path: "/track",
-    element: <Track />
-  }
-]);
 
 ReactDOM.render(
   <React.StrictMode>
     <UserContextProvider>
       <div className="text-white text-center m-auto pt-[5%] bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 h-screen">
-        <RouterProvider router={router} />
+        <App />
+        <ToastContainer />
       </div>
     </UserContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
+
 
