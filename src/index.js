@@ -1,10 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import "./index.css";
 import App from './App';
-import {
-  Navigate
-} from "react-router-dom";
 import { UserContextProvider } from './user-context';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import { auth } from "./firebase.config";
+import { toast } from "react-toastify";
 
 export const UserContext = createContext();
 
@@ -15,9 +16,10 @@ export const UserContextProvider = ({children}) => {
         return () => unregister();
     }, []);
 
-    const signOutUser = () => {
+    const signOutUser = async() => {
         setIsLoading(true);
-        auth.signOut();
+        await auth.signOut();
+        toast.success("Signed out successfully")
     }
     return (
         <UserContext.Provider
