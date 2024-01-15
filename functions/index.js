@@ -7,15 +7,13 @@ admin.initializeApp();
 // Initialize the Vision API client
 const visionClient = new vision.ImageAnnotatorClient();
 
-exports.processImage = functions.https.onRequest({ cors: true }, async (req, res) => {
+exports.processImage = functions.https.onRequest(async (req, res) => {
     try {
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Access-Control-Allow-Methods', 'GET, POST');
 
         if (req.method === "OPTIONS") {
-            // stop preflight requests here
+            res.set('Access-Control-Allow-Methods', '*');
+            res.set('Access-Control-Allow-Headers', '*');
             res.status(204).send('');
-            return;
         }
         // Check if the request has a file attached
         if (!req.body || !req.body.imageBase64) {
@@ -48,23 +46,5 @@ exports.processImage = functions.https.onRequest({ cors: true }, async (req, res
     } catch (error) {
         console.error('Error processing image:', error);
         return res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-functions.http('corsEnabledFunction', (req, res) => {
-    // Set CORS headers for preflight requests
-    // Allows GETs from any origin with the Content-Type header
-    // and caches preflight response for 3600s
-
-    res.set('Access-Control-Allow-Origin', '*');
-
-    if (req.method === 'OPTIONS') {
-        // Send response to OPTIONS requests
-        res.set('Access-Control-Allow-Methods', 'GET');
-        res.set('Access-Control-Allow-Headers', 'Content-Type');
-        res.set('Access-Control-Max-Age', '3600');
-        res.status(204).send('');
-    } else {
-        res.send('Hello World!');
     }
 });
