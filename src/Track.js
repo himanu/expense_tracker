@@ -6,7 +6,46 @@ import { addDocument } from "./firestore";
 
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
+    const [image, setImage] = useState(null);
 
+    const handleImageChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleUpload = async () => {
+        try {
+            if (!image) {
+                console.error('No image selected');
+                return;
+            }
+
+            // Make a POST request to your Cloud Function
+            const response = await fetch('https://us-central1-fir-384a7.cloudfunctions.net/processImage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ imageBase64: image.split(',')[1] }), // Send base64-encoded image
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Expense details:', data.expenseDetails);
+                // Handle the extracted expense details as needed
+            } else {
+                console.error('Error processing image:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+        }
+    };
     return (
         <div>
             <h1 className="text-3xl">
@@ -18,6 +57,8 @@ const Track = () => {
             >
                 Add <IoMdAdd />
             </button>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+            <button onClick={handleUpload}>Upload Image</button>
             {isOpen && <ExpensePopup onClose={() => toggleIsOpen(false)} /> }
         </div>
     )

@@ -7,7 +7,7 @@ admin.initializeApp();
 // Initialize the Vision API client
 const visionClient = new vision.ImageAnnotatorClient();
 
-exports.processImage = functions.https.onRequest(async (req, res) => {
+exports.processImage = functions.https.onRequest({ cors: true }, async (req, res) => {
     try {
         // Check if the request has a file attached
         if (!req.body || !req.body.imageBase64) {
