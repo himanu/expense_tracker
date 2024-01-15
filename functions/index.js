@@ -10,9 +10,10 @@ const visionClient = new vision.ImageAnnotatorClient();
 exports.processImage = functions.https.onRequest(async (req, res) => {
     try {
         console.log("Hey I got trigerred");
+        res.set('Access-Control-Allow-Headers', '*');
+        res.set('Access-Control-Allow-Methods', '*');
+        res.set('Access-Control-Allow-Origin', '*');
         if (req.method === "OPTIONS") {
-            res.set('Access-Control-Allow-Methods', '*');
-            res.set('Access-Control-Allow-Headers', '*');
             res.status(204).send('');
             return;
         }

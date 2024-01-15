@@ -3,7 +3,7 @@ import React, { useState, useContext } from 'react';
 import { uploadFile } from "./storage";
 import { UserContext } from "./user-context";
 import { addDocument } from "./firestore";
-
+import { getFunctions, httpsCallable } from "firebase/functions";
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
     const [image, setImage] = useState(null);
@@ -27,6 +27,11 @@ const Track = () => {
             }
 
             // Make a POST request to your Cloud Function
+            // const functions = getFunctions();
+            // const processImageFunc = httpsCallable(functions, 'processImage');
+            // const response = await processImageFunc({
+            //     imageBase64: image.split(',')[1]
+            // })
             const response = await fetch('https://us-central1-fir-384a7.cloudfunctions.net/processImage', {
                 method: 'POST',
                 headers: {
