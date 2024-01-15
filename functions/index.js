@@ -9,11 +9,12 @@ const visionClient = new vision.ImageAnnotatorClient();
 
 exports.processImage = functions.https.onRequest(async (req, res) => {
     try {
-
+        console.log("Hey I got trigerred");
         if (req.method === "OPTIONS") {
             res.set('Access-Control-Allow-Methods', '*');
             res.set('Access-Control-Allow-Headers', '*');
             res.status(204).send('');
+            return;
         }
         // Check if the request has a file attached
         if (!req.body || !req.body.imageBase64) {
