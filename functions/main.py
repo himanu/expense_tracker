@@ -1,5 +1,6 @@
 from firebase_functions import https_fn
 from firebase_functions.params import StringParam
+from firebase_functions.options import CorsOptions
 from firebase_admin import initialize_app
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import JsonOutputParser
@@ -19,11 +20,9 @@ class Format(BaseModel):
 # Initialize app
 initialize_app()
 
-
-@https_fn.on_request()
+@https_fn.on_request(cors=CorsOptions(cors_methods="*", cors_origins="*"))
 def on_request_example(req: https_fn.Request):
     try:
-        request_json = req.get_json(silent=True)
         file = req.files.get("image")
         dest_file_path = file.filename
         file.save(dest_file_path)

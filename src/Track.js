@@ -3,20 +3,13 @@ import React, { useState, useContext } from 'react';
 import { uploadFile } from "./storage";
 import { UserContext } from "./user-context";
 import { addDocument } from "./firestore";
-import { getFunctions, httpsCallable } from "firebase/functions";
+
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
     const [image, setImage] = useState(null);
 
     const handleImageChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
+        setImage(event.target.files[0]);
     };
 
     const handleUpload = async () => {
@@ -25,21 +18,14 @@ const Track = () => {
                 console.error('No image selected');
                 return;
             }
-            const response = await fetch('https://us-central1-fir-384a7.cloudfunctions.net/processImage', {
+            const formData = new FormData();
+            formData.append('image', image);
+            const response = await fetch('http://127.0.0.1:5001/fir-384a7/us-central1/on_request_example', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ imageBase64: image.split(',')[1] }), // Send base64-encoded image
+                body: formData
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log('Expense details:', data.expenseDetails);
-                // Handle the extracted expense details as needed
-            } else {
-                console.error('Error processing image:', response.statusText);
-            }
+            console.log("response ", response);
         } catch (error) {
             console.error('Error uploading image:', error);
         }
