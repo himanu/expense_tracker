@@ -25,13 +25,6 @@ const Track = () => {
                 console.error('No image selected');
                 return;
             }
-
-            // Make a POST request to your Cloud Function
-            // const functions = getFunctions();
-            // const processImageFunc = httpsCallable(functions, 'processImage');
-            // const response = await processImageFunc({
-            //     imageBase64: image.split(',')[1]
-            // })
             const response = await fetch('https://us-central1-fir-384a7.cloudfunctions.net/processImage', {
                 method: 'POST',
                 headers: {
