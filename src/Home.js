@@ -27,7 +27,7 @@ const Home = () => {
                 isLoading ? "" : (
                     !user ? <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} /> : (
                         <button
-                            className="text-sm mt-5 hover:bg-gradient-to-l from-purple-700 via-purple-900 to-purple-700 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-900  py-1 px-3 rounded-md"
+                            className="text-sm mt-5 hover:bg-gradient-to-l from-purple-700 via-purple-900 to-purple-700 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-900  py-2 px-3 rounded-md"
                             onClick={signOutUser}
                         >
                             Sign Out
@@ -37,7 +37,7 @@ const Home = () => {
             }
 
             {!isLoading && user && (
-                <Link to="/track" className="text-sm mt-5 bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700 ml-3  py-1 px-3 rounded-md">
+                <Link to="/track" className="text-sm mt-5 bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700 ml-3  py-2 px-3 rounded-md">
                     Track Expenses
                 </Link>
             )}
