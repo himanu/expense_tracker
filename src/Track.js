@@ -1,4 +1,5 @@
 import { IoMdAdd } from "react-icons/io";
+import { MdOutlineCancel } from "react-icons/md";
 import React, { useState, useContext } from 'react';
 import { UserContext } from "./user-context";
 import useTrackExpense from "./useTrackExpense";
@@ -6,7 +7,7 @@ import useTrackExpense from "./useTrackExpense";
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
     const [image, setImage] = useState(null);
-    useTrackExpense();
+    const { completedExpenses, draftExpenses } = useTrackExpense();
 
     const handleImageChange = (event) => {
         setImage(event.target.files[0]);
@@ -35,15 +36,59 @@ const Track = () => {
             <h1 className="text-3xl">
                 Expenses
             </h1>
-            <button 
-                onClick={() => toggleIsOpen(true)}
-                className="text-base flex w-[30%] m-auto justify-center gap-2 items-center mt-4 py-3 px-4 rounded-lg bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700"
+
+            <button
+                onClick={() => toggleIsOpen(!isOpen)}
+                className="text-base w-[30%] flex m-auto justify-center gap-2 items-center mt-4 py-3 px-4 rounded-lg bg-gradient-to-l from-blue-700 via-blue-900 to-blue-700"
             >
                 Add <IoMdAdd />
             </button>
-            <input type="file" accept="image/*" onChange={handleImageChange} />
-            <button onClick={handleUpload}>Upload Image</button>
-            <ExpensePopup onClose={() => toggleIsOpen(false)} isOpen={isOpen} />
+            <PopUp isOpen={isOpen}>
+
+                <div style={{ fontWeight: "bold", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <h1> Add Expense </h1>
+                    <MdOutlineCancel fontSize="20px" cursor="pointer" onClick={() => toggleIsOpen(!isOpen)} />
+                </div>
+                <label>
+                    <input type="file" accept="image/*" className="my-4 text-sm text-slate-500
+                            file:mr-4 file:py-2 file:px-4
+                            file:rounded-full file:border-0
+                            file:text-sm file:font-semibold
+                            file:bg-violet-50 file:text-violet-700
+                            hover:file:bg-violet-100"
+                        onChange={handleImageChange}
+                        style={{ cursor: "pointer" }}
+                        required
+                    />
+                </label>
+                <button
+                    onClick={handleUpload}
+                    style={{ display: "block", margin: "auto", background: "rgba(107, 114, 128, 0.3)", borderRadius: "5px", fontSize: "14px", padding: "5px 8px" }}
+                >
+                    Submit
+                </button>
+            </PopUp>
+        </div>
+    )
+};
+
+const PopUp = ({ children, isOpen }) => {
+    return (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center" style={{
+            visibility: isOpen ? "visible" : "hidden",
+            transition: "visibility 0s, opacity 0.5s linear",
+            opacity: isOpen ? 1 : 0
+        }}>
+            <div style={{
+                width: "fit-content",
+                height: "fit-content",
+                border: "1px solid",
+                padding: "1rem",
+                background: "#fff",
+                color: "black"
+            }}>
+                {children}
+            </div>
         </div>
     )
 };
@@ -54,7 +99,7 @@ const ExpensePopup = ({ onClose, isOpen }) => {
     const [location, setLocation] = useState('');
     const [item, setItem] = useState('');
     const [amount, setAmount] = useState('');
-    const { user }  = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     const handleSubmit = async (e) => {
         try {
@@ -97,18 +142,7 @@ const ExpensePopup = ({ onClose, isOpen }) => {
                 <div className="flex justify-center text-lg mb-4 font-bold">
                     Add Expense
                 </div>
-                <label className="block mb-4">
-                    <span className="sr-only">Choose Receipt</span>
-                    <input type="file" accept="image/*"  className="block w-full text-sm text-slate-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-violet-50 file:text-violet-700
-                      hover:file:bg-violet-100"
-                      onChange={handleFileChange}
-                      required
-                    />
-                </label>
+
                 <label className="block mb-4">
                     Date:
                     <input

@@ -3,15 +3,18 @@ import Track from "./Track";
 import Home from "./Home";
 import { useContext } from "react";
 import { UserContext } from "./user-context";
+import LoadingSvg from "./Loading";
 
 
-const PrivateRouteComponent = ({ children, isAllowed, redirectPath }) => {
+const PrivateRouteComponent = ({ children, isAllowed, redirectPath, isLoading }) => {
+  if (isLoading)
+    return <LoadingSvg />
   if (!isAllowed)
     return <Navigate to={redirectPath} replace />
   return children;
 }
 function App() {
-  const { user } = useContext(UserContext);
+  const { user, isLoading } = useContext(UserContext);
   const router = createBrowserRouter([
     {
       path: "/",
@@ -20,7 +23,7 @@ function App() {
     {
       path: "/track",
       element: (
-        <PrivateRouteComponent redirectPath="/" isAllowed={!!user} >
+        <PrivateRouteComponent redirectPath="/" isAllowed={!!user} isLoading={isLoading} >
           <Track />
         </PrivateRouteComponent>
       )

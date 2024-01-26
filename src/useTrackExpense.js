@@ -1,22 +1,46 @@
-import { useContext, useEffect } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
+import { collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase.config";
 import { UserContext } from "./user-context";
 
 const useTrackExpense = () => {
     const { user } = useContext(UserContext);
+    const [completedExpenses, setCompletedExpenses] = useState([]);
+    const [draftExpenses, setDraftExpenses] = useState([]);
+
     const getExpenses = async () => {
-        const q = query(collection(db, "expenses"), where("uid", "==", user?.uid));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
-        });
+        try {
+            const q = query(collection(db, "expenses"), where("uid", "==", user?.uid));
+            const querySnapshot = await getDocs(q);
+            readExpenses(querySnapshot);
+        } catch (err) {
+            console.log("Error ", err);
+        }
     }
+
+    const readExpenses = (snapshot) => {
+        const newCompletedExpenses = [], newDraftExpenses = [];
+        snapshot.forEach((doc) => {
+            const expense = doc.data();
+            expense.isCompleted ? newCompletedExpenses.push(expense) : newDraftExpenses.push(expense);
+        });
+        setCompletedExpenses(newCompletedExpenses);
+        setDraftExpenses(newDraftExpenses);
+    }
+
     useEffect(() => {
         user && getExpenses();
-        console.log("user ", user);
+        const unSubscribe = onSnapshot(
+            query(collection(db, "expenses"), where("uid", "==", user?.uid)),
+            readExpenses
+        )
+        return unSubscribe;
     }, []);
+
+    return {
+        completedExpenses,
+        draftExpenses
+    }
 };
 
 export default useTrackExpense;
