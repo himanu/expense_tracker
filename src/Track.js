@@ -1,12 +1,12 @@
 import { IoMdAdd } from "react-icons/io";
 import React, { useState, useContext } from 'react';
-import { uploadFile } from "./storage";
 import { UserContext } from "./user-context";
-import { addDocument } from "./firestore";
+import useTrackExpense from "./useTrackExpense";
 
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
     const [image, setImage] = useState(null);
+    useTrackExpense();
 
     const handleImageChange = (event) => {
         setImage(event.target.files[0]);
@@ -43,12 +43,12 @@ const Track = () => {
             </button>
             <input type="file" accept="image/*" onChange={handleImageChange} />
             <button onClick={handleUpload}>Upload Image</button>
-            {isOpen && <ExpensePopup onClose={() => toggleIsOpen(false)} /> }
+            <ExpensePopup onClose={() => toggleIsOpen(false)} isOpen={isOpen} />
         </div>
     )
 };
 
-const ExpensePopup = ({ onClose }) => {
+const ExpensePopup = ({ onClose, isOpen }) => {
     const [file, setFile] = useState(null);
     const [date, setDate] = useState('');
     const [location, setLocation] = useState('');
@@ -61,15 +61,13 @@ const ExpensePopup = ({ onClose }) => {
             e.preventDefault();
             if (!date || !location || !item || !amount || !file)
                 return;
-            const filePath = await uploadFile(file, user?.uid);
-            await addDocument({
-                date,
-                location,
-                item,
-                amount: Number(amount),
-                uid: user?.uid,
-                receipt:  filePath ?? ""
-            })
+            // await addDocument({
+            //     date,
+            //     location,
+            //     item,
+            //     amount: Number(amount),
+            //     uid: user?.uid,
+            // })
             setFile(null);
             setDate('');
             setLocation('');
@@ -90,7 +88,11 @@ const ExpensePopup = ({ onClose }) => {
         }
     };
     return (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center" style={{
+            visibility: isOpen ? "visible" : "hidden",
+            transition: "visibility 0s, opacity 0.5s linear",
+            opacity: isOpen ? 1 : 0
+        }}>
             <form className="bg-white text-gray-800 p-8 rounded-md shadow-md w-96">
                 <div className="flex justify-center text-lg mb-4 font-bold">
                     Add Expense
