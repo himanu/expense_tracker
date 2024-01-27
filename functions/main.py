@@ -31,6 +31,7 @@ def on_request_example(req: https_fn.Request):
         print(response)
         return response
     except Exception as e:
+        print(e)
         return https_fn.Response({"error": str(e)}, status=500)
 
 def call_gemini_vision(file_path):
@@ -43,7 +44,7 @@ def call_gemini_vision(file_path):
         content=[
             {
                 "type": "text",
-                "text": "I am giving an image of a bill. I want to know items with their prices in the bill. Please provide items with their cost." + format_instructions,
+                "text": "I am giving an image. If image is not a bill receipt then consider this as an error and send error message in json response saying invalid image uploaded. If image is a bill please send all items with name and theirs price in json response" + format_instructions,
             },
             {"type": "image_url", "image_url": file_path},
         ]
