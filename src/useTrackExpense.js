@@ -22,7 +22,7 @@ const useTrackExpense = () => {
         const newCompletedExpenses = [], newDraftExpenses = [];
         snapshot.forEach((doc) => {
             const expense = doc.data();
-            expense.isCompleted ? newCompletedExpenses.push(expense) : newDraftExpenses.push(expense);
+            expense.isCompleted ? newCompletedExpenses.push({ ...expense, id: doc.id }) : newDraftExpenses.push({ ...expense, id: doc.id });
         });
         setCompletedExpenses(newCompletedExpenses);
         setDraftExpenses(newDraftExpenses);

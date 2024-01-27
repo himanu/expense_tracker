@@ -1,6 +1,6 @@
 import { IoMdAdd } from "react-icons/io";
 import { MdOutlineCancel } from "react-icons/md";
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { UserContext } from "./user-context";
 import useTrackExpense from "./useTrackExpense";
 
@@ -10,11 +10,8 @@ const Track = () => {
     const [image, setImage] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const inputRef = useRef(null);
-    const [date, setDate] = useState('');
-    const [location, setLocation] = useState('');
-    const [item, setItem] = useState('');
-    const [amount, setAmount] = useState('');
     const { completedExpenses, draftExpenses } = useTrackExpense();
+    const [selectedExpense, selectExpense] = useState("");
 
     const handleImageChange = (event) => {
         setImage(event.target.files[0]);
@@ -49,17 +46,20 @@ const Track = () => {
             <div className="text-2xl flex m-auto items-center gap-2">
                 Expenses <IoMdAdd onClick={() => toggleIsOpen(!isOpen)} style={{paddingTop: "3px", fontSize: "28px"}} cursor="pointer" fontWeight="bold" />
             </div>
-            <div className="bg-slate-200 font-medium text-gray-600 font-mono rounded-md cursor-pointer px-3 py-1 relative mt-8 flex gap-10  hover:scale-105 transition ease-in-out delay-150 duration-200" onClick={() => toggleIsExpensePopUpOpen(true)}>
-                <div className="text-left italic text-violet-500">
-                    <div> 12 Jan,2024 </div>
-                    <div> $30 </div>
+            {[...completedExpenses, ...draftExpenses].map((expense) => (
+                <div key={expense.id} className="bg-slate-200 font-medium text-gray-600 font-mono rounded-md cursor-pointer px-3 py-1 relative mt-8 flex gap-10  hover:scale-105 transition ease-in-out delay-150 duration-200" onClick={() => selectExpense(expense)}>
+                    <div className="text-left italic text-violet-500">
+                        <div> {expense.date} </div>
+                        <div> ${expense.amount} </div>
+                    </div>
+                    <div style={{ width: "1px", background: "rgba(75, 85, 99, 0.5)" }}></div>
+                    <div className="text-left font-medium text-violet-700">
+                        <div> {expense.location}</div>
+                        <div> {expense.item} </div>
+                    </div>
                 </div>
-                <div style={{ width: "1px", background: "rgba(75, 85, 99, 0.5)"}}></div>
-                <div className="text-left font-medium text-violet-700"> 
-                    <div> India Gate, New Delhi</div>
-                    <div> Pizza, Dal Makhani, Rice, Chappati, Juice </div> 
-                </div>
-            </div>
+            ))}
+
             <PopUp isOpen={isOpen}>
                 <div style={{ fontWeight: "bold", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <h1> Add Expense </h1>
@@ -88,7 +88,7 @@ const Track = () => {
                     {isUploading ? "Processing ..." : "Submit "}
                 </button>
             </PopUp>
-            <ExpensePopup isOpen={isExpensePopUpOpen} onClose={toggleIsExpensePopUpOpen}/>
+            <ExpensePopup expense={selectedExpense} onClose={() => selectExpense(null)}/>
         </div>
     )
 };
@@ -113,17 +113,12 @@ const PopUp = ({ children, isOpen }) => {
     )
 };
 
-const ExpensePopup = ({ onClose, isOpen }) => {
-    const [file, setFile] = useState(null);
-    const [date, setDate] = useState('');
-    const [location, setLocation] = useState('');
-    const [item, setItem] = useState('');
-    const [amount, setAmount] = useState('');
-
+const ExpensePopup = ({ onClose, expense }) => {
+    const [newExpense, setExpense] = useState(expense);
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
-            if (!date || !location || !item || !amount || !file)
+            // if (!date || !location || !item || !amount)
                 return;
             // await addDocument({
             //     date,
@@ -132,32 +127,34 @@ const ExpensePopup = ({ onClose, isOpen }) => {
             //     amount: Number(amount),
             //     uid: user?.uid,
             // })
-            setFile(null);
-            setDate('');
-            setLocation('');
-            setItem('');
-            setAmount('');
             onClose();
         } catch (err) {
             console.log("Error ", err);
         }
     };
 
+    useEffect(()=> {
+        setExpense(expense);
+    }, [expense]);
+
     return (
-        <PopUp isOpen={isOpen}>
+        <PopUp isOpen={!!expense}>
             <div className="text-gray-800">
                 <div style={{ fontWeight: "bold", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <h1> Add Expense </h1>
-                    <MdOutlineCancel color="rgb(251 113 133)" fontSize="20px" cursor="pointer" onClick={() => onClose(false)} />
+                    <MdOutlineCancel color="rgb(251 113 133)" fontSize="20px" cursor="pointer" onClick={onClose} />
                 </div>
 
                 <label className="block mb-4">
                     Date:
                     <input
                         type="date"
-                        value={date}
+                        value={newExpense?.date}
                         className="w-full border border-gray-300 p-2 rounded"
-                        onChange={(e) => setDate(e.target.value)}
+                        onChange={(e) => setExpense((expense) => ({
+                            ...expense,
+                            date: e.target.value
+                        }))}
                         required
                     />
                 </label>
@@ -165,21 +162,26 @@ const ExpensePopup = ({ onClose, isOpen }) => {
                     Location:
                     <input
                         type="text"
-                        value={location}
+                        value={newExpense?.location}
                         className="w-full border border-gray-300 p-2 rounded"
-                        onChange={(e) => setLocation(e.target.value)}
+                        onChange={(e) => setExpense((expense) => ({
+                            ...expense,
+                            location: e.target.value
+                        }))}
                         required
                     />
                 </label>
                 <label className="block mb-4">
                     Item:
-
                 </label>
                 <input
                     type="text"
-                    value={item}
+                    value={newExpense?.item}
                     className="w-full border border-gray-300 p-2 rounded"
-                    onChange={(e) => setItem(e.target.value)}
+                    onChange={(e) => setExpense((expense) => ({
+                        ...expense,
+                        item: e.target.value
+                    }))}
                     required
                 />
                 <label className="block mb-4">
@@ -187,9 +189,12 @@ const ExpensePopup = ({ onClose, isOpen }) => {
                     <input
                         type="number"
                         min="0"
-                        value={amount}
+                        value={newExpense?.amount}
                         className="w-full border border-gray-300 p-2 rounded"
-                        onChange={(e) => setAmount(e.target.value)}
+                        onChange={(e) => setExpense((expense) => ({
+                            ...expense,
+                            amount: e.target.value
+                        }))}
                         required
                     />
                 </label>
@@ -202,7 +207,7 @@ const ExpensePopup = ({ onClose, isOpen }) => {
                 </button>
                 <button
                     className="ml-2 px-4 bg-red-500 text-white p-2 rounded hover:bg-red-700"
-                    onClick={() => onClose(false)}
+                    onClick={onClose}
                 >
                     Cancel
                 </button>
