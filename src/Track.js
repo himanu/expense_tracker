@@ -10,9 +10,9 @@ const Track = () => {
     const [image, setImage] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const inputRef = useRef(null);
-    const { completedExpenses, draftExpenses } = useTrackExpense();
+    const { expenses } = useTrackExpense();
     const [selectedExpense, selectExpense] = useState("");
-
+    const { user } = useContext(UserContext);
     const handleImageChange = (event) => {
         setImage(event.target.files[0]);
     };
@@ -26,9 +26,10 @@ const Track = () => {
             setIsUploading(true);
             const formData = new FormData();
             formData.append('image', image);
+            formData.append("access_token", user?.accessToken)
             const response = await fetch('http://127.0.0.1:5001/fir-384a7/us-central1/on_request_example', {
                 method: 'POST',
-                body: formData
+                body: formData,
             });
 
             console.log("response ", response);
@@ -46,15 +47,15 @@ const Track = () => {
             <div className="text-2xl flex m-auto items-center gap-2">
                 Expenses <IoMdAdd onClick={() => toggleIsOpen(!isOpen)} style={{paddingTop: "3px", fontSize: "28px"}} cursor="pointer" fontWeight="bold" />
             </div>
-            {[...completedExpenses, ...draftExpenses].map((expense) => (
-                <div key={expense.id} className="bg-slate-200 font-medium text-gray-600 font-mono rounded-md cursor-pointer px-3 py-1 relative mt-8 flex gap-10  hover:scale-105 transition ease-in-out delay-150 duration-200" onClick={() => selectExpense(expense)}>
-                    <div className="text-left italic text-violet-500">
-                        <div> {expense.date} </div>
-                        <div> ${expense.amount} </div>
+            {expenses.map((expense) => (
+                <div key={expense.id} className="bg-slate-200 font-medium text-gray-600 font-mono rounded-md cursor-pointer px-3 py-1 relative mt-8 flex gap-5  hover:scale-105 transition ease-in-out delay-150 duration-200" onClick={() => selectExpense(expense)}>
+                    <div className="text-left min-w-fit">
+                        <div className="font-semibold text-gray-700"> {expense.date} </div>
+                        <div> ₹{expense.amount} </div>
                     </div>
                     <div style={{ width: "1px", background: "rgba(75, 85, 99, 0.5)" }}></div>
-                    <div className="text-left font-medium text-violet-700">
-                        <div> {expense.location}</div>
+                    <div className="text-left font-medium">
+                        <div className="font-semibold text-gray-700"> {expense.location}</div>
                         <div> {expense.item} </div>
                     </div>
                 </div>
@@ -136,7 +137,7 @@ const ExpensePopup = ({ onClose, expense }) => {
     useEffect(()=> {
         setExpense(expense);
     }, [expense]);
-
+    const isUpdatedBtnDisabled = JSON.stringify(newExpense) === JSON.stringify(expense);
     return (
         <PopUp isOpen={!!expense}>
             <div className="text-gray-800">
@@ -189,6 +190,7 @@ const ExpensePopup = ({ onClose, expense }) => {
                     <input
                         type="number"
                         min="0"
+                        step=".01"
                         value={newExpense?.amount}
                         className="w-full border border-gray-300 p-2 rounded"
                         onChange={(e) => setExpense((expense) => ({
@@ -199,17 +201,19 @@ const ExpensePopup = ({ onClose, expense }) => {
                     />
                 </label>
                 <button
-                    className="bg-blue-500 text-white px-4 p-2 rounded hover:bg-blue-700"
+                    className={`bg-blue-500 opacity-1 disabled:opacity-80 text-white px-4 p-2 rounded ${isUpdatedBtnDisabled ? "cursor-not-allowed" : "hover:bg-blue-700"}`}
                     onClick={() => { }}
                     type="submit"
+                    disabled={isUpdatedBtnDisabled}
+                    title={isUpdatedBtnDisabled ? "Found no changes" : ""}
                 >
-                    Add
+                    Update
                 </button>
                 <button
                     className="ml-2 px-4 bg-red-500 text-white p-2 rounded hover:bg-red-700"
-                    onClick={onClose}
+                    onClick={() => {}}
                 >
-                    Cancel
+                    Delete
                 </button>
             </div>
         </PopUp>

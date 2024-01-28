@@ -5,8 +5,7 @@ import { UserContext } from "./user-context";
 
 const useTrackExpense = () => {
     const { user } = useContext(UserContext);
-    const [completedExpenses, setCompletedExpenses] = useState([]);
-    const [draftExpenses, setDraftExpenses] = useState([]);
+    const [expenses, setExpenses] = useState([]);
 
     const getExpenses = async () => {
         try {
@@ -19,13 +18,12 @@ const useTrackExpense = () => {
     }
 
     const readExpenses = (snapshot) => {
-        const newCompletedExpenses = [], newDraftExpenses = [];
+        const newExpenses = [];
         snapshot.forEach((doc) => {
             const expense = doc.data();
-            expense.isCompleted ? newCompletedExpenses.push({ ...expense, id: doc.id }) : newDraftExpenses.push({ ...expense, id: doc.id });
+            newExpenses.push({ ...expense, id: doc.id });
         });
-        setCompletedExpenses(newCompletedExpenses);
-        setDraftExpenses(newDraftExpenses);
+        setExpenses(newExpenses);
     }
 
     useEffect(() => {
@@ -38,8 +36,7 @@ const useTrackExpense = () => {
     }, []);
 
     return {
-        completedExpenses,
-        draftExpenses
+        expenses,
     }
 };
 
