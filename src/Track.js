@@ -31,7 +31,7 @@ const Track = () => {
             const formData = new FormData();
             formData.append('image', image);
             formData.append("access_token", user?.accessToken)
-            const response = await fetch('http://127.0.0.1:5001/fir-384a7/us-central1/on_request_example', {
+            const response = await fetch(`${process.env.REACT_APP_BASE_URL}/on_request_example`, {
                 method: 'POST',
                 body: formData,
             });
