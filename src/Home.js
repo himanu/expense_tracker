@@ -16,7 +16,7 @@ const uiConfig = {
 const Home = () => {
     const { user, isLoading, signOutUser} = useContext(UserContext);
     return (
-        <div>
+        <div className="mt-16">
             <div className="text-3xl">
                 {user.displayName ? `Hey ${user.displayName.split(" ")[0]}, ` : ""}Welcome to Expense Tracker!
             </div>

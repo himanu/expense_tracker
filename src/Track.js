@@ -5,6 +5,8 @@ import { UserContext } from "./user-context";
 import useTrackExpense from "./useTrackExpense";
 import { LoaderContext } from "./loader-context";
 import { toast } from "react-toastify";
+import { IoMdArrowBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
@@ -12,8 +14,9 @@ const Track = () => {
     const inputRef = useRef(null);
     const { expenses, deleteExpense, updateExpense } = useTrackExpense();
     const [selectedExpense, selectExpense] = useState("");
-    const { user } = useContext(UserContext);
+    const { user, signOutUser } = useContext(UserContext);
     const {toggleLoader, loader} = useContext(LoaderContext);
+    const navigate = useNavigate();
     const handleImageChange = (event) => {
         setImage(event.target.files[0]);
     };
@@ -49,6 +52,10 @@ const Track = () => {
     };
     return (
         <div style={{maxWidth: "900px", margin: "auto"}}>
+            <div className="flex justify-between items-center pb-10">
+                <IoMdArrowBack fontSize="20px" cursor="pointer" onClick={() => navigate("/")} />
+                <span style={{cursor: "pointer"}} onClick={signOutUser}> Log Out </span>
+            </div>
             <div className="text-2xl flex m-auto items-center gap-2">
                 Expenses <IoMdAdd onClick={() => toggleIsOpen(!isOpen)} style={{paddingTop: "3px", fontSize: "28px"}} cursor="pointer" fontWeight="bold" />
             </div>
@@ -129,6 +136,7 @@ const ExpensePopup = ({ onClose, expense, deleteExpense, toggleLoader, updateExp
             await updateExpense(expense.id, newExpense, expense)
             toggleLoader(false);
             onClose();
+            toast.success("Successfully updated expense!")
         } catch (err) {
             console.log("Error ", err);
         }
@@ -192,7 +200,7 @@ const ExpensePopup = ({ onClose, expense, deleteExpense, toggleLoader, updateExp
                     required
                 />
                 <label className="block mb-4">
-                    Amount ($):
+                    Amount (₹):
                     <input
                         type="number"
                         min="0"

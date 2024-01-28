@@ -83,7 +83,14 @@ def on_request_example(req: https_fn.Request):
         print("error", e)
         if Path(dest_file_path).exists():
             os.remove(dest_file_path)
-        return https_fn.Response({"error": str(e)}, status=500)
+        
+        if dest_file_path.__contains__(".avif"):
+            return {
+                "error": "Avif format not supported"
+            }
+        return {
+            "error":  str(e)
+        }
 
 def call_gemini_vision(file_path):
     # Set up a parser + inject instructions into the prompt template.
