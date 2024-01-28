@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { collection, query, where, getDocs, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, where, getDocs, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "./firebase.config";
 import { UserContext } from "./user-context";
 
@@ -28,6 +28,27 @@ const useTrackExpense = () => {
 
     const deleteExpense = async (id) => deleteDoc(doc(db, "expenses", id))
 
+    const updateExpense = async (id, newExpense, originalExpense) => {
+        const expenseRef = doc(db, "expenses", id);
+
+        await updateDoc(expenseRef, getChangedKeys(originalExpense, newExpense));
+    }
+
+    const getChangedKeys = (oldObj, newObj) => {
+        const changedKeys = {};
+
+        for (const key in newObj) {
+            if (oldObj.hasOwnProperty(key)) {
+                if (oldObj[key] !== newObj[key]) {
+                    changedKeys[key] = newObj[key];
+                }
+            } else {
+                changedKeys[key] = newObj[key];
+            }
+        }
+
+        return changedKeys;
+    }
     useEffect(() => {
         user && getExpenses();
         const unSubscribe = onSnapshot(
@@ -39,7 +60,8 @@ const useTrackExpense = () => {
 
     return {
         expenses,
-        deleteExpense
+        deleteExpense,
+        updateExpense
     }
 };
 

@@ -10,7 +10,7 @@ const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
     const [image, setImage] = useState(null);
     const inputRef = useRef(null);
-    const { expenses, deleteExpense } = useTrackExpense();
+    const { expenses, deleteExpense, updateExpense } = useTrackExpense();
     const [selectedExpense, selectExpense] = useState("");
     const { user } = useContext(UserContext);
     const {toggleLoader, loader} = useContext(LoaderContext);
@@ -94,7 +94,7 @@ const Track = () => {
                     {loader ? "Processing ..." : "Submit "}
                 </button>
             </PopUp>
-            <ExpensePopup expense={selectedExpense} onClose={() => selectExpense(null)} deleteExpense={deleteExpense} toggleLoader={toggleLoader} />
+            <ExpensePopup expense={selectedExpense} onClose={() => selectExpense(null)} deleteExpense={deleteExpense} toggleLoader={toggleLoader} updateExpense={updateExpense} />
         </div>
     )
 };
@@ -119,19 +119,15 @@ const PopUp = ({ children, isOpen }) => {
     )
 };
 
-const ExpensePopup = ({ onClose, expense, deleteExpense, toggleLoader }) => {
+const ExpensePopup = ({ onClose, expense, deleteExpense, toggleLoader, updateExpense }) => {
     const [newExpense, setExpense] = useState(expense);
-    const handleSubmit = async (e) => {
+
+    const handleUpdate = async (e) => {
         try {
             e.preventDefault();
-            // if (!date || !location || !item || !amount)
-            // await addDocument({
-            //     date,
-            //     location,
-            //     item,
-            //     amount: Number(amount),
-            //     uid: user?.uid,
-            // })
+            toggleLoader(true);
+            await updateExpense(expense.id, newExpense, expense)
+            toggleLoader(false);
             onClose();
         } catch (err) {
             console.log("Error ", err);
@@ -212,7 +208,7 @@ const ExpensePopup = ({ onClose, expense, deleteExpense, toggleLoader }) => {
                 </label>
                 <button
                     className={`bg-blue-500 opacity-1 disabled:opacity-80 text-white px-4 p-2 rounded ${isUpdatedBtnDisabled ? "cursor-not-allowed" : "hover:bg-blue-700"}`}
-                    onClick={() => { }}
+                    onClick={handleUpdate}
                     type="submit"
                     disabled={isUpdatedBtnDisabled}
                     title={isUpdatedBtnDisabled ? "Found no changes" : ""}
