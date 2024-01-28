@@ -51,7 +51,7 @@ const Track = () => {
         }
     };
     return (
-        <div style={{maxWidth: "900px", margin: "auto"}}>
+        <div style={{maxWidth: "900px", margin: "auto", padding: "10px 20px"}}>
             <div className="flex justify-between items-center pb-10">
                 <IoMdArrowBack fontSize="20px" cursor="pointer" onClick={() => navigate("/")} />
                 <span style={{cursor: "pointer"}} onClick={signOutUser}> Log Out </span>
