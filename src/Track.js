@@ -3,16 +3,16 @@ import { MdOutlineCancel } from "react-icons/md";
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import { UserContext } from "./user-context";
 import useTrackExpense from "./useTrackExpense";
+import { LoaderContext } from "./loader-context";
 
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
-    const [isExpensePopUpOpen, toggleIsExpensePopUpOpen] = useState(false);
     const [image, setImage] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
     const inputRef = useRef(null);
     const { expenses } = useTrackExpense();
     const [selectedExpense, selectExpense] = useState("");
     const { user } = useContext(UserContext);
+    const {toggleLoader, loader} = useContext(LoaderContext);
     const handleImageChange = (event) => {
         setImage(event.target.files[0]);
     };
@@ -23,7 +23,8 @@ const Track = () => {
                 console.error('No image selected');
                 return;
             }
-            setIsUploading(true);
+            // setIsUploading(true);
+            toggleLoader(true)
             const formData = new FormData();
             formData.append('image', image);
             formData.append("access_token", user?.accessToken)
@@ -36,7 +37,8 @@ const Track = () => {
         } catch (error) {
             console.error('Error uploading image:', error);
         } finally {
-            setIsUploading(false);
+            // setIsUploading(false);
+            toggleLoader(false)
             toggleIsOpen(false);
             setImage(null);
             inputRef.current.value = null;
@@ -77,16 +79,16 @@ const Track = () => {
                         onChange={handleImageChange}
                         style={{ cursor: "pointer" }}
                         required
-                        disabled={isUploading}
+                        disabled={loader}
                         ref={inputRef}
                     />
                 </label>
                 <button
                     onClick={handleUpload}
-                    style={{ display: "block", margin: "auto", background: "rgba(107, 114, 128, 0.3)", borderRadius: "5px", fontSize: "14px", padding: "5px 8px", cursor: (!image || isUploading) && "not-allowed", opacity: (!image || isUploading) && "0.5" }}
-                    disabled={!image || isUploading}
+                    style={{ display: "block", margin: "auto", background: "rgba(107, 114, 128, 0.3)", borderRadius: "5px", fontSize: "14px", padding: "5px 8px", cursor: (!image || loader) && "not-allowed", opacity: (!image || loader) && "0.5" }}
+                    disabled={!image || loader}
                 >
-                    {isUploading ? "Processing ..." : "Submit "}
+                    {loader ? "Processing ..." : "Submit "}
                 </button>
             </PopUp>
             <ExpensePopup expense={selectedExpense} onClose={() => selectExpense(null)}/>
@@ -120,7 +122,6 @@ const ExpensePopup = ({ onClose, expense }) => {
         try {
             e.preventDefault();
             // if (!date || !location || !item || !amount)
-                return;
             // await addDocument({
             //     date,
             //     location,

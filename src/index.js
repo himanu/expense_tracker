@@ -5,15 +5,19 @@ import App from './App';
 import { UserContextProvider } from './user-context';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LoadingSvg from './Loading';
+import { LoaderContextProvider } from './loader-context';
 
 
 ReactDOM.render(
   <React.StrictMode>
     <UserContextProvider>
-      <div className="text-white text-center m-auto pt-[5%] bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 h-screen">
-        <App />
-        <ToastContainer />
-      </div>
+      <LoaderContextProvider>
+        <div className="text-white text-center m-auto pt-[5%] bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 h-screen">
+          <App />
+          <ToastContainer />
+        </div>
+      </LoaderContextProvider>
     </UserContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
