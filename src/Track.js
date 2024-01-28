@@ -10,7 +10,7 @@ const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
     const [image, setImage] = useState(null);
     const inputRef = useRef(null);
-    const { expenses } = useTrackExpense();
+    const { expenses, deleteExpense } = useTrackExpense();
     const [selectedExpense, selectExpense] = useState("");
     const { user } = useContext(UserContext);
     const {toggleLoader, loader} = useContext(LoaderContext);
@@ -24,7 +24,6 @@ const Track = () => {
                 console.error('No image selected');
                 return;
             }
-            // setIsUploading(true);
             toggleLoader(true)
             const formData = new FormData();
             formData.append('image', image);
@@ -42,7 +41,6 @@ const Track = () => {
         } catch (error) {
             console.error('Error uploading image:', error);
         } finally {
-            // setIsUploading(false);
             toggleLoader(false)
             toggleIsOpen(false);
             setImage(null);
@@ -96,7 +94,7 @@ const Track = () => {
                     {loader ? "Processing ..." : "Submit "}
                 </button>
             </PopUp>
-            <ExpensePopup expense={selectedExpense} onClose={() => selectExpense(null)}/>
+            <ExpensePopup expense={selectedExpense} onClose={() => selectExpense(null)} deleteExpense={deleteExpense} toggleLoader={toggleLoader} />
         </div>
     )
 };
@@ -121,7 +119,7 @@ const PopUp = ({ children, isOpen }) => {
     )
 };
 
-const ExpensePopup = ({ onClose, expense }) => {
+const ExpensePopup = ({ onClose, expense, deleteExpense, toggleLoader }) => {
     const [newExpense, setExpense] = useState(expense);
     const handleSubmit = async (e) => {
         try {
@@ -140,6 +138,12 @@ const ExpensePopup = ({ onClose, expense }) => {
         }
     };
 
+    const handleDelete = async () => {
+        toggleLoader(true);
+        await deleteExpense(expense.id);
+        toggleLoader(false);
+        onClose();
+    }
     useEffect(()=> {
         setExpense(expense);
     }, [expense]);
@@ -217,7 +221,7 @@ const ExpensePopup = ({ onClose, expense }) => {
                 </button>
                 <button
                     className="ml-2 px-4 bg-red-500 text-white p-2 rounded hover:bg-red-700"
-                    onClick={() => {}}
+                    onClick={handleDelete}
                 >
                     Delete
                 </button>

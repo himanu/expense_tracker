@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
+import { collection, query, where, getDocs, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { db } from "./firebase.config";
 import { UserContext } from "./user-context";
 
@@ -26,6 +26,8 @@ const useTrackExpense = () => {
         setExpenses(newExpenses);
     }
 
+    const deleteExpense = async (id) => deleteDoc(doc(db, "expenses", id))
+
     useEffect(() => {
         user && getExpenses();
         const unSubscribe = onSnapshot(
@@ -37,6 +39,7 @@ const useTrackExpense = () => {
 
     return {
         expenses,
+        deleteExpense
     }
 };
 
