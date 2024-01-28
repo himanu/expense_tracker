@@ -5,7 +5,6 @@ import App from './App';
 import { UserContextProvider } from './user-context';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import LoadingSvg from './Loading';
 import { LoaderContextProvider } from './loader-context';
 
 

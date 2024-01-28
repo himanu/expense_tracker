@@ -4,6 +4,7 @@ import React, { useState, useContext, useRef, useEffect } from 'react';
 import { UserContext } from "./user-context";
 import useTrackExpense from "./useTrackExpense";
 import { LoaderContext } from "./loader-context";
+import { toast } from "react-toastify";
 
 const Track = () => {
     const [isOpen, toggleIsOpen] = useState(false);
@@ -32,8 +33,12 @@ const Track = () => {
                 method: 'POST',
                 body: formData,
             });
-
-            console.log("response ", response);
+            const json = await response.json();
+            console.log("response ", json);
+            if (json.error)
+                toast.error(json.error)
+            else
+                toast.success("Successfully processed the bill!!!")
         } catch (error) {
             console.error('Error uploading image:', error);
         } finally {
