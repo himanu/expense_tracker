@@ -1,8 +1,8 @@
 from firebase_functions import https_fn
 from firebase_functions.params import StringParam
 from firebase_functions.options import CorsOptions
-import firebase_admin
-from google.cloud import firestore
+from firebase_admin import initialize_app, firestore, auth
+import google.cloud.firestore
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.pydantic_v1 import BaseModel, Field
@@ -23,9 +23,7 @@ class Format(BaseModel):
     place: str = Field(description="Place where transaction took place")
 
 # initialize_app
-app = firebase_admin.initialize_app()
-# db
-db = firestore.Client()
+app = initialize_app()
 #currency rates
 c = CurrencyRates()
 
@@ -34,7 +32,7 @@ def on_request_example(req: https_fn.Request):
     try:
         file = req.files.get("image")
         access_token = req.form.get("access_token")
-        user = firebase_admin.auth.verify_id_token(access_token)
+        user = auth.verify_id_token(access_token)
         print("user ", user["uid"])
         if (not file):
             return {
@@ -77,7 +75,8 @@ def on_request_example(req: https_fn.Request):
             "location": gemini_res["place"],
             "created_at": datetime.now()
         }
-        db.collection("expenses").add(document)
+        firestore_client: google.cloud.firestore.Client = firestore.client()
+        firestore_client.collection("expenses").add(document)
         return document
     except Exception as e:
         print("error", e)
