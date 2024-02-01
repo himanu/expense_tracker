@@ -30,7 +30,7 @@ const Home = () => {
                             className="text-sm mt-5 hover:bg-gradient-to-l from-purple-700 via-purple-900 to-purple-700 bg-gradient-to-r from-purple-900 via-purple-700 to-purple-900  py-2 px-3 rounded-md"
                             onClick={signOutUser}
                         >
-                            Sign Out
+                            Log Out
                         </button>
                     )
                 )
