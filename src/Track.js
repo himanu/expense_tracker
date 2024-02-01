@@ -60,14 +60,14 @@ const Track = () => {
                 Expenses <IoMdAdd onClick={() => toggleIsOpen(!isOpen)} style={{paddingTop: "3px", fontSize: "28px"}} cursor="pointer" fontWeight="bold" />
             </div>
             {expenses.map((expense) => (
-                <div key={expense.id} className="bg-slate-200 font-medium text-gray-600 font-mono rounded-md cursor-pointer px-3 py-1 relative mt-8 flex gap-5  hover:scale-105 transition ease-in-out delay-150 duration-200" onClick={() => selectExpense(expense)}>
+                <div key={expense.id} style={{ background: "hsla(0,0%,100%,.3)"}}className="font-medium text-white font-mono rounded-md cursor-pointer px-3 py-1 relative mt-8 flex gap-5  hover:scale-105 transition ease-in-out delay-150 duration-200" onClick={() => selectExpense(expense)}>
                     <div className="text-left min-w-fit">
-                        <div className="font-semibold text-gray-700"> {expense.date} </div>
+                        <div className="font-semibold"> {expense.date} </div>
                         <div> ₹{expense.amount} </div>
                     </div>
                     <div style={{ width: "1px", background: "rgba(75, 85, 99, 0.5)" }}></div>
                     <div className="text-left font-medium">
-                        <div className="font-semibold text-gray-700"> {expense.location}</div>
+                        <div className="font-semibold"> {expense.location}</div>
                         <div> {expense.item} </div>
                     </div>
                 </div>
