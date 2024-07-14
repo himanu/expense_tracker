@@ -9,7 +9,7 @@ const useTrackExpense = () => {
 
     const getExpenses = async () => {
         try {
-            const q = query(collection(db, "expenses"), where("uid", "==", user?.uid));
+            const q = query(collection(db, "expenses"));
             const querySnapshot = await getDocs(q);
             readExpenses(querySnapshot);
         } catch (err) {
